@@ -1,0 +1,41 @@
+﻿@page "/"
+@using Color = MudBlazor.Color
+@using Transition = MudBlazor.Transition
+@using Size = MudBlazor.Size
+
+<PageTitle>Home</PageTitle>
+
+<MudPaper Class="pa-4 mb-8" Elevation="3">
+    <div class="d-flex align-items-center gap-4">
+        <image src="/images/profile.jpg" class="rounded-circle profile-image"></image>
+        <div>
+            <h2 class="h4">Hello Joanne</h2>
+            <h3 class="h6">Member Premium</h3>
+        </div>
+    </div>
+</MudPaper>
+<MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+    <MudCarouselItem Transition="transition" Color="@Color.Primary">
+        <div class="d-flex" style="height:100%">
+            <MudImage Src="images/promo1.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
+        </div>
+    </MudCarouselItem>
+    <MudCarouselItem Transition="transition" Color="@Color.Secondary">
+        <div class="d-flex" style="height:100%">
+            <MudImage Src="images/promo2.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
+        </div>
+    </MudCarouselItem>
+    <MudCarouselItem Transition="transition">
+        <div class="d-flex" style="height:100%">
+            <MudImage Src="images/promo3.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
+        </div>
+    </MudCarouselItem>
+</MudCarousel>
+
+@code {
+    private bool arrows = true;
+    private bool bullets = true;
+    private bool enableSwipeGesture = true;
+    private bool autocycle = true;
+    private Transition transition = Transition.Slide;
+}
