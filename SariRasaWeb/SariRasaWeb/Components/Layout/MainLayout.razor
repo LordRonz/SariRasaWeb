@@ -34,10 +34,16 @@
 
 <MudLayout>
     <MudAppBar>
-        My Application
+        <MudLink Href="/">
+            <MudImage Src="images/logo.png" Alt="Sari Rasa" Elevation="25" Class="rounded-circle" Width="35" Height="35" />
+        </MudLink>
+        <MudSpacer />
+        <MudLink Href="/profile">
+            <MudImage Src="images/profile.jpg" Alt="Profile" Elevation="25" Class="rounded-circle" Width="35" Height="35" />
+        </MudLink>
     </MudAppBar>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
             @Body
         </MudContainer>
     </MudMainContent>

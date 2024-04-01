@@ -7,26 +7,36 @@
 
 <MudPaper Class="pa-4 mb-8" Elevation="3">
     <div class="d-flex align-items-center gap-4">
-        <image src="/images/profile.jpg" class="rounded-circle profile-image"></image>
+        <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage>
         <div>
             <h2 class="h4">Hello Joanne</h2>
-            <h3 class="h6">Member Premium</h3>
+            <h3 class="h6 text-danger">Jumlah Point</h3>
+            <h3 class="h6">130</h3>
         </div>
     </div>
 </MudPaper>
-<MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
-    <MudCarouselItem Transition="transition" Color="@Color.Primary">
-        <div class="d-flex" style="height:100%">
+<MudPaper Class="pa-4 mb-8" Elevation="3" Style="background: rgb(248, 246, 204)">
+    <div class="d-flex align-items-center justify-content-center gap-4">
+        <div>
+            <h3 class="h4 m-0">Kartu Member</h3>
+        </div>
+        <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Error" Href="/card">Lihat Kartu</MudButton>
+    </div>
+</MudPaper>
+<MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Melalui Whatsapp" />
+<MudCarousel Class="mud-width-full" Style="height:400px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+    <MudCarouselItem Transition="transition">
+        <div class="d-flex justify-content-center" style="height:100%">
             <MudImage Src="images/promo1.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
         </div>
     </MudCarouselItem>
-    <MudCarouselItem Transition="transition" Color="@Color.Secondary">
-        <div class="d-flex" style="height:100%">
+    <MudCarouselItem Transition="transition">
+        <div class="d-flex justify-content-center" style="height:100%">
             <MudImage Src="images/promo2.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
         </div>
     </MudCarouselItem>
     <MudCarouselItem Transition="transition">
-        <div class="d-flex" style="height:100%">
+        <div class="d-flex justify-content-center" style="height:100%">
             <MudImage Src="images/promo3.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
         </div>
     </MudCarouselItem>
