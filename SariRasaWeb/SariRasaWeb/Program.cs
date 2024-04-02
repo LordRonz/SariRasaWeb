@@ -2,6 +2,7 @@ using BlazorReports.Extensions;
 using MudBlazor.Services;
 using SariRasaWeb.Client.Pages;
 using SariRasaWeb.Components;
+using SariRasaWeb.Data;
 using SariRasaWeb.Properties.Report;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddMudServices();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddBlazorReports();
+builder.Services.AddScoped<AppDbContext>();
 
 var app = builder.Build();
 
