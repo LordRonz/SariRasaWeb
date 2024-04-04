@@ -9,7 +9,7 @@
     <div class="d-flex align-items-center gap-4">
         <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage>
         <div>
-            <h2 class="h4">Hello Joanne</h2>
+            <h2 class="h4">Hello @userName</h2>
             <h3 class="h6 text-danger">Jumlah Point</h3>
             <h3 class="h6">130</h3>
         </div>
@@ -42,10 +42,36 @@
     </MudCarouselItem>
 </MudCarousel>
 
+
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
 @code {
     private bool arrows = true;
     private bool bullets = true;
     private bool enableSwipeGesture = true;
     private bool autocycle = true;
     private Transition transition = Transition.Slide;
+
+    string userName = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var token = await ProtectedSessionStore.GetAsync<string>("token");
+        if (!token.Success)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+        var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+        if (authPayload == null)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+
+        userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+
+        StateHasChanged();
+    }
 }

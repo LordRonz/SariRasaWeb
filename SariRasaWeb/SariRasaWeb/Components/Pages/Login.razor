@@ -6,6 +6,7 @@
 @using SariRasaWeb.Models
 @using Microsoft.EntityFrameworkCore;
 @using Color = MudBlazor.Color
+@using BC = BCrypt.Net.BCrypt;
 
 <PageTitle>Login</PageTitle>
 
@@ -17,7 +18,7 @@
         </div>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
             <MudTextField T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="InputType.Password" @ref="pwField" />
+            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="InputType.Password" @ref="pwField" @bind-Value="userPass" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Log In</MudButton>
         </MudForm>
     </MudPaper>
@@ -27,6 +28,9 @@
 
 
 @inject AppDbContext dbContext
+@inject ISnackbar Snackbar
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
     List<MCustomer> customers = new List<MCustomer>();
@@ -36,6 +40,7 @@
     MudTextField<string> pwField;
     MudTextField<string> userNameField;
     string userName = "";
+    string userPass = "";
     string ktp = "";
     MudForm form;
 
@@ -61,9 +66,33 @@
         customers = await dbContext.MCustomer.ToListAsync();
     }
 
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
     public async Task OnSubmit()
     {
         var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-        ktp = customer.KTP;
+        if (customer == null)
+        {
+            addSnackbar("User not found");
+            return;
+        }
+        if (!BC.Verify(userPass, customer.UserPass))
+        {
+            addSnackbar("Invalid username or password");
+            return;
+        }
+
+        var token = SariRasaWeb.Utils.Auth.GenerateToken(customer.UserName);
+
+        await ProtectedSessionStore.SetAsync("token", token);
+
+        addSnackbar("Logged In", Severity.Success);
+
+        NavManager.NavigateTo("/");
     }
 }

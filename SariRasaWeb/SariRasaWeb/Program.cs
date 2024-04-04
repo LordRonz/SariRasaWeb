@@ -4,8 +4,13 @@ using SariRasaWeb.Client.Pages;
 using SariRasaWeb.Components;
 using SariRasaWeb.Data;
 using SariRasaWeb.Properties.Report;
+using SariRasaWeb.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var root = Directory.GetCurrentDirectory();
+var dotenv = Path.Combine(root, ".env");
+DotEnv.Load(dotenv);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
