@@ -2,6 +2,7 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using Color = MudBlazor.Color
+@inject IDialogService DialogService
 
 <PageTitle>Profile</PageTitle>
 
@@ -29,6 +30,7 @@
                 </MudForm>
             </MudPaper>
         </MudItem>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto rounded-3" OnClick="OpenDialog">Log Out</MudButton>
     </MudGrid>
 </main>
 
@@ -65,5 +67,10 @@
         if (pwField1.Value != arg)
             return "Passwords don't match";
         return null;
+    }
+
+    private void OpenDialog()
+    {
+        DialogService.Show<SariRasaWeb.Components.Dialog.LogOutDialog>("Log Out");
     }
 }
