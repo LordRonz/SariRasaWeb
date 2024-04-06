@@ -1,4 +1,9 @@
 ﻿@page "/"
+@using Microsoft.EntityFrameworkCore;
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using SariRasaWeb.Data
+@using SariRasaWeb.Models
 @using Color = MudBlazor.Color
 @using Transition = MudBlazor.Transition
 @using Size = MudBlazor.Size
@@ -26,24 +31,20 @@
         </div>
     </MudPaper>
     <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Melalui Whatsapp" />
-    <MudCarousel Class="mud-width-full mt-8" Style="height:400px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
-        <MudCarouselItem Transition="transition">
-            <div class="d-flex justify-content-center" style="height:100%">
-                <MudImage Src="images/promo1.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="transition">
-            <div class="d-flex justify-content-center" style="height:100%">
-                <MudImage Src="images/promo2.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="transition">
-            <div class="d-flex justify-content-center" style="height:100%">
-                <MudImage Src="images/promo3.png" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
-            </div>
-        </MudCarouselItem>
-    </MudCarousel>
-} 
+    @if (promosi.Length > 0)
+    {
+        <MudCarousel Class="mud-width-full mt-8" Style="height:400px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+            @foreach (MPromosi p in promosi)
+            {
+                <MudCarouselItem Transition="transition">
+                    <div class="d-flex justify-content-center" style="height:100%">
+                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Elevation="25" Class="rounded-lg" />
+                    </div>
+                </MudCarouselItem>
+            }
+        </MudCarousel>
+    }
+}
 else
 {
     <MudContainer Class="d-flex justify-content-center align-items-center vh-100">
@@ -52,7 +53,7 @@ else
 }
 
 
-
+@inject AppDbContext dbContext
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @code {
@@ -64,6 +65,12 @@ else
     private bool loaded = false;
 
     string userName = "";
+    MPromosi[] promosi = [];
+
+    private string GetPromosiLink(string slug)
+    {
+        return $"images/{slug}";
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -82,6 +89,9 @@ else
 
         userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
         loaded = true;
+        var now = DateTime.Now;
+        promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
+
         StateHasChanged();
     }
 }
