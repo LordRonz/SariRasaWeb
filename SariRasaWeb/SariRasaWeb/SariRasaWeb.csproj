@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SariRasaWeb.Client\SariRasaWeb.Client.csproj" />
+    <PackageReference Include="BarcodeLib" Version="3.0.3" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="BlazorReports" Version="0.20.0" />
     <PackageReference Include="BootstrapBlazor" Version="8.3.0" />

@@ -1,4 +1,9 @@
 ﻿@page "/card"
+@using BarcodeStandard
+@using SkiaSharp
+@using Microsoft.EntityFrameworkCore;
+@using SariRasaWeb.Data;
+@using Type = BarcodeStandard.Type
 @using Color = MudBlazor.Color
 @using Transition = MudBlazor.Transition
 @using Size = MudBlazor.Size
@@ -7,14 +12,52 @@
 
 <MudContainer Class="">
     <MudPaper Class="pa-4 mb-8 d-flex justify-content-center align-items-center align-self-center h-100" Elevation="3">
-       <MudImage Src="/images/membership-card.jpg" Class="profile-image" Width="400" Height="400"></MudImage>
+        <MudImage Src="@data" Class="Membership card Barcode" Width="400" Height="400"></MudImage>
     </MudPaper>
 </MudContainer>
 
+
+@inject AppDbContext dbContext
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
 @code {
     private bool arrows = true;
     private bool bullets = true;
     private bool enableSwipeGesture = true;
     private bool autocycle = true;
     private Transition transition = Transition.Slide;
+
+    private string data = "";
+
+    public void getBarcode(string dataToEncode)
+    {
+        var b = new Barcode();
+        b.IncludeLabel = true;
+        var img = b.Encode(Type.Code128, dataToEncode, SKColors.Black, SKColors.White, 290, 120);
+        var data = img.Encode(SKEncodedImageFormat.Png, 50);
+        this.data = "data:image/png;base64," + Convert.ToBase64String(data.ToArray());
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var token = await ProtectedSessionStore.GetAsync<string>("token");
+        if (!token.Success)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+        var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+        if (authPayload == null)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+
+        var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+
+        var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+
+        getBarcode(customer.NOMBR);
+        StateHasChanged();
+    }
 }
