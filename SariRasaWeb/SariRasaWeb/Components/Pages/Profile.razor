@@ -1,6 +1,8 @@
 ﻿@page "/profile"
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore;
+@using SariRasaWeb.Data;
 @using Color = MudBlazor.Color
 @inject IDialogService DialogService
 
@@ -11,7 +13,7 @@
         <div class="d-flex align-items-center gap-4">
             <image src="/images/profile.jpg" class="rounded-circle profile-image"></image>
             <div>
-                <h2 class="h4">Joanne Anabel</h2>
+                <h2 class="h4">@nameTitle</h2>
                 <h3 class="h6">Member Premium</h3>
             </div>
         </div>
@@ -20,13 +22,12 @@
         <MudItem xs="12" sm="12">
             <MudPaper Class="pa-4" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
-                    <MudTextField T="string" Label="Username" />
-                    <MudTextField T="string" Label="Nama Lengkap" />
-                    <MudTextField T="string" Label="Email" RequiredError="Email is required!"
-                                    Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-                    <MudTextField T="string" Label="Alamat" />
-                    <MudTextField T="string" Label="No. HP" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true">Simpan</MudButton>
+                    <MudTextField T="string" Label="Username" @bind-Value="@userName" Disabled />
+                    <MudTextField T="string" Label="Nama Lengkap" @bind-Value="@namaLengkap" />
+                    <MudTextField T="string" Label="Email" RequiredError="Email is required!" Disabled @bind-Value="@email" />
+                    <MudTextField T="string" Label="Alamat" @bind-Value="@alamat" />
+                    <MudTextField T="string" Label="No. HP" @bind-Value="@noHp" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Simpan</MudButton>
                 </MudForm>
             </MudPaper>
         </MudItem>
@@ -36,7 +37,10 @@
 
 
 
-
+@inject AppDbContext dbContext
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
+@inject ISnackbar Snackbar
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
 
@@ -44,33 +48,106 @@
     string[] errors = { };
     MudTextField<string> pwField1;
     MudForm form;
+    string nameTitle = "";
+    string userName = "";
+    string namaLengkap = "";
+    string email = "";
+    string alamat = "";
+    string noHp = "";
+    string nomorCustomer = "";
 
-    private IEnumerable<string> PasswordStrength(string pw)
-    {
-        if (string.IsNullOrWhiteSpace(pw))
-        {
-            yield return "Password is required!";
-            yield break;
-        }
-        if (pw.Length < 8)
-            yield return "Password must be at least of length 8";
-        if (!Regex.IsMatch(pw, @"[A-Z]"))
-            yield return "Password must contain at least one capital letter";
-        if (!Regex.IsMatch(pw, @"[a-z]"))
-            yield return "Password must contain at least one lowercase letter";
-        if (!Regex.IsMatch(pw, @"[0-9]"))
-            yield return "Password must contain at least one digit";
-    }
+    // private IEnumerable<string> PasswordStrength(string pw)
+    // {
+    //     if (string.IsNullOrWhiteSpace(pw))
+    //     {
+    //         yield return "Password is required!";
+    //         yield break;
+    //     }
+    //     if (pw.Length < 8)
+    //         yield return "Password must be at least of length 8";
+    //     if (!Regex.IsMatch(pw, @"[A-Z]"))
+    //         yield return "Password must contain at least one capital letter";
+    //     if (!Regex.IsMatch(pw, @"[a-z]"))
+    //         yield return "Password must contain at least one lowercase letter";
+    //     if (!Regex.IsMatch(pw, @"[0-9]"))
+    //         yield return "Password must contain at least one digit";
+    // }
 
-    private string PasswordMatch(string arg)
-    {
-        if (pwField1.Value != arg)
-            return "Passwords don't match";
-        return null;
-    }
+    // private string PasswordMatch(string arg)
+    // {
+    //     if (pwField1.Value != arg)
+    //         return "Passwords don't match";
+    //     return null;
+    // }
 
     private void OpenDialog()
     {
         DialogService.Show<SariRasaWeb.Components.Dialog.LogOutDialog>("Log Out");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await ProtectedSessionStore.GetAsync<string>("token");
+            if (!token.Success)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+            var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+            if (authPayload == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+
+            var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+
+            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+
+            this.userName = customer.UserName;
+            namaLengkap = customer.NMCUS;
+            alamat = customer.ALAMAT;
+            noHp = customer.NOMHP;
+            email = customer.Email;
+
+            nameTitle = customer.NMCUS;
+            nomorCustomer = customer.NOMBR;
+
+            await dbContext.SaveChangesAsync();
+
+            StateHasChanged();
+        }
+    }
+
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
+    private async Task OnSubmit()
+    {
+        System.Diagnostics.Debug.Print("AJG");
+        var customer = await dbContext.MCustomer.FirstAsync(c => c.NOMBR == nomorCustomer);
+        if (customer == null)
+        {
+            return;
+        }
+        System.Diagnostics.Debug.Print(customer.NOMBR);
+
+        customer.UserName = this.userName;
+        customer.NMCUS = namaLengkap;
+        customer.ALAMAT = alamat;
+        customer.NOMHP = noHp;
+        customer.Email = email;
+
+        System.Diagnostics.Debug.Print(namaLengkap);
+
+        await dbContext.SaveChangesAsync();
+
+        addSnackbar("Changes saved", Severity.Success);
     }
 }

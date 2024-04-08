@@ -23,5 +23,6 @@ namespace SariRasaWeb.Models
         public DateTime? TGMBR { get; set; }
         public string? UserName { get; set; }
         public string? UserPass { get; set; }
+        public string? Email { get; set; }
     }
 }

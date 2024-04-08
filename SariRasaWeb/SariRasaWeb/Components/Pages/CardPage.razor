@@ -40,24 +40,27 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var token = await ProtectedSessionStore.GetAsync<string>("token");
-        if (!token.Success)
+        if (firstRender)
         {
-            NavManager.NavigateTo("/login");
-            return;
+            var token = await ProtectedSessionStore.GetAsync<string>("token");
+            if (!token.Success)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+            var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+            if (authPayload == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+
+            var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+
+            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+
+            getBarcode(customer.NOMBR);
+            StateHasChanged();
         }
-        var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
-        if (authPayload == null)
-        {
-            NavManager.NavigateTo("/login");
-            return;
-        }
-
-        var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-
-        var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-
-        getBarcode(customer.NOMBR);
-        StateHasChanged();
     }
 }

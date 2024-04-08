@@ -74,24 +74,26 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var token = await ProtectedSessionStore.GetAsync<string>("token");
-        if (!token.Success)
-        {
-            NavManager.NavigateTo("/login");
-            return;
-        }
-        var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
-        if (authPayload == null)
-        {
-            NavManager.NavigateTo("/login");
-            return;
-        }
+        if (firstRender) {
+            var token = await ProtectedSessionStore.GetAsync<string>("token");
+            if (!token.Success)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+            var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+            if (authPayload == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
 
-        userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-        loaded = true;
-        var now = DateTime.Now;
-        promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
+            userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+            loaded = true;
+            var now = DateTime.Now;
+            promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
 
-        StateHasChanged();
+            StateHasChanged();
+        }
     }
 }
