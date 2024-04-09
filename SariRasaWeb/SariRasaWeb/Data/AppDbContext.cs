@@ -18,5 +18,6 @@ namespace SariRasaWeb.Data
 
         public DbSet<MCustomer> MCustomer { get; set; }
         public DbSet<MPromosi> MPromosi { get; set; }
+        public DbSet<HistoryPoint> HistoryPoint { get; set; }
     }
 }

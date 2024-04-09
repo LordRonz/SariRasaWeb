@@ -1,14 +1,20 @@
 ﻿@page "/activity"
-@using System.Net.Http.Json
-@using SariRasaWeb.Models
-@inject HttpClient httpClient
-@using SariRasaWeb.Utils
+@using System.Net.Http.Json;
+@using SariRasaWeb.Models;
+@inject HttpClient httpClient;
+@using SariRasaWeb.Utils;
+@using Microsoft.EntityFrameworkCore;
+@using SariRasaWeb.Data;
 
 @using PatientModel = SariRasaWeb.Models.Patient
 @using Table = SariRasaWeb.Components.Table.Table
 
 <SariRasaWeb.Components.Table.Table Config="Config" />
 
+
+@inject AppDbContext dbContext
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -19,29 +25,44 @@
 
     private IEnumerable<PatientModel> Patients = new List<PatientModel>();
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Elements = new List<Element>()
+        if (firstRender)
         {
-            new Element("Tess", 69, "waduh", 102),
-            new Element("Tesss", 691, "waduhos", 101),
-            new Element("Tessss", 694, "waduh", 103),
-        };
+            var token = await ProtectedSessionStore.GetAsync<string>("token");
+            if (!token.Success)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+            var authPayload = SariRasaWeb.Utils.Auth.ValidateToken(token.Value);
+            if (authPayload == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
 
-        Patients = new List<PatientModel>()
-        {
-            new PatientModel("Profira Manyar", new DateTime(), "TR01", "White Glow Facial", 1, "dr novita"),
-            new PatientModel("Profira Central", new DateTime(), "TR02", "White Glow Facial", 1, "dr aleg")
-        };
+            var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
 
-        Config = new TableConfig(new List<TableColumn> { 
-            new TableColumn { Caption="Tgl", DataField="tanggal" },
-            new TableColumn { Caption="Keterangan", DataField="keterangan" },
-            new TableColumn { Caption="Point", DataField="point" },
-        }, new List<object>{ 
-            new { tanggal = "10 Jan 2024", keterangan = "Penambahan Poin", point = 10 },
-            new { tanggal = "12 Jan 2024", keterangan = "Pengurangan Poin", point = 5 },
-        });
+            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+
+            var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).ToArrayAsync();
+
+            var dataSource = histories.Select(el =>
+            {
+                return (object) new { tanggal = el.TGFAK, keterangan = el.POINT > 0 ? "Penambahan Poin" : "Pengurangan Poin", point = el.POINT };
+            }
+            ).ToList();
+
+            Config = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="Tgl", DataField="tanggal" },
+                new TableColumn { Caption="Keterangan", DataField="keterangan" },
+                new TableColumn { Caption="Point", DataField="point" },
+            }, dataSource);
+
+            StateHasChanged();
+        }
     }
 
 }
