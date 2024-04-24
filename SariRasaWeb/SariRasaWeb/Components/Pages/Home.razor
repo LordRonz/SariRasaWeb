@@ -16,7 +16,7 @@
         <div class="d-flex align-items-center gap-4">
             <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage>
             <div>
-                <h2 class="h4">Hello @userName</h2>
+                <h2 class="h4">Hello @name</h2>
                 <h3 class="h6 text-danger">Jumlah Point</h3>
                 <h3 class="h6">130</h3>
             </div>
@@ -65,6 +65,7 @@ else
     private bool loaded = false;
 
     string userName = "";
+    string name = "";
     MPromosi[] promosi = [];
 
     private string GetPromosiLink(string slug)
@@ -89,6 +90,8 @@ else
             }
 
             userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            name = customer.NMCUS;
             loaded = true;
             var now = DateTime.Now;
             promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
