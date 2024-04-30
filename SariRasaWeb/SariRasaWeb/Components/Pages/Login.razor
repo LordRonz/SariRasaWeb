@@ -21,6 +21,7 @@
             <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Log In</MudButton>
         </MudForm>
+        <MudLink Class="mt-4" Href="/change-password">Change password</MudLink>
     </MudPaper>
 </MudContainer>
 
