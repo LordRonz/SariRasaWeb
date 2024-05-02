@@ -37,8 +37,8 @@
             @foreach (MPromosi p in promosi)
             {
                 <MudCarouselItem Transition="transition">
-                    <div class="d-flex justify-content-center" style="height:100%">
-                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Elevation="25" Class="rounded-lg" />
+                    <div class="d-flex justify-content-center h-100 w-100" style="">
+                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
                     </div>
                 </MudCarouselItem>
             }
