@@ -1,4 +1,5 @@
 ﻿
 ::deep .nav-active {
-    color: orange;
+    color: orange !important;
+    opacity: 100% !important;
 }
