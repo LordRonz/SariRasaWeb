@@ -59,7 +59,7 @@
 
             var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
 
-            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
 
             getBarcode(customer.NOMBR);
             StateHasChanged();

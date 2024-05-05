@@ -104,7 +104,13 @@
 
             var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
 
-            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
+
+            if (customer == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
 
             this.userName = customer.UserName;
             namaLengkap = customer.NMCUS;

@@ -12,9 +12,9 @@
 
 @if (loaded)
 {
-    <MudPaper Class="pa-4 mb-8" Elevation="3">
+    <MudPaper Class="pa-4 mb-4" Elevation="3">
         <div class="d-flex align-items-center gap-4">
-            <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage>
+            @* <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage> *@
             <div>
                 <h2 class="h4">Hello @name</h2>
                 <h3 class="h6 text-danger">Jumlah Point</h3>
@@ -22,7 +22,7 @@
             </div>
         </div>
     </MudPaper>
-    <MudPaper Class="pa-4 mb-8" Elevation="3" Style="background: rgb(248, 246, 204)">
+    <MudPaper Class="pa-4 mb-4" Elevation="3" Style="background: rgb(248, 246, 204)">
         <div class="d-flex align-items-center justify-content-center gap-4">
             <div>
                 <h3 class="h4 m-0">Kartu Member</h3>
@@ -33,7 +33,17 @@
     <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Melalui Whatsapp" Class="w-100" Target="_blank" Href="https://wa.me/628113500899" />
     @if (promosi.Length > 0)
     {
-        <MudCarousel Class="mud-width-full mt-8" Style="height:400px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+        <MudCarousel Class="mud-width-full d-md-none mt-4" Style="height:250px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+            @foreach (MPromosi p in promosi)
+            {
+                <MudCarouselItem Transition="transition">
+                    <div class="d-flex justify-content-center h-100 w-100" style="">
+                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
+                    </div>
+                </MudCarouselItem>
+            }
+        </MudCarousel>
+        <MudCarousel Class="mud-width-full d-none d-md-block mt-4" Style="height:350px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
             @foreach (MPromosi p in promosi)
             {
                 <MudCarouselItem Transition="transition">
@@ -90,7 +100,7 @@ else
             }
 
             userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
             name = customer.NMCUS;
             loaded = true;
             var now = DateTime.Now;

@@ -45,7 +45,7 @@
 
             var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
 
-            var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
 
             var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).ToArrayAsync();
 

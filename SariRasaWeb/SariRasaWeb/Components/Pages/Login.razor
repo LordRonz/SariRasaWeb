@@ -17,7 +17,7 @@
             @* <h1 class="h4 poppins-regular">Sari Rasa</h1> *@
         </div>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-            <MudTextField T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+            <MudTextField T="string" Label="Nomor HP" @ref="userNameField" @bind-Value="userName" />
             <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Log In</MudButton>
         </MudForm>
@@ -94,7 +94,7 @@
 
     public async Task OnSubmit()
     {
-        var customer = await dbContext.MCustomer.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+        var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
         if (customer == null)
         {
             addSnackbar("User not found");
@@ -106,7 +106,7 @@
             return;
         }
 
-        var token = SariRasaWeb.Utils.Auth.GenerateToken(customer.UserName);
+        var token = SariRasaWeb.Utils.Auth.GenerateToken(customer.NOMHP);
 
         await ProtectedSessionStore.SetAsync("token", token);
 
