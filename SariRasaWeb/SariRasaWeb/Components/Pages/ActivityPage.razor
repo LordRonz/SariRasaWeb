@@ -47,6 +47,8 @@
 
             var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
 
+            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_HistoryPoint '{customer.NOMBR}'");
+
             var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).ToArrayAsync();
 
             var dataSource = histories.Select(el =>

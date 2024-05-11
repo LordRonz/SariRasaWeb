@@ -18,7 +18,7 @@
             <div>
                 <h2 class="h4">Hello @name</h2>
                 <h3 class="h6 text-danger">Jumlah Point</h3>
-                <h3 class="h6">130</h3>
+                <h3 class="h6">@point</h3>
             </div>
         </div>
     </MudPaper>
@@ -76,6 +76,7 @@ else
 
     string userName = "";
     string name = "";
+    int point = 0;
     MPromosi[] promosi = [];
 
     private string GetPromosiLink(string slug)
@@ -105,6 +106,11 @@ else
             loaded = true;
             var now = DateTime.Now;
             promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
+
+            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
+
+            var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
+            point = sldPoint.POINT ?? 0;
 
             StateHasChanged();
         }
