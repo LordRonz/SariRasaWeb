@@ -22,7 +22,6 @@
         <MudItem xs="12" sm="12">
             <MudPaper Class="pa-4" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
-                    <MudTextField T="string" Label="Username" @bind-Value="@userName" Disabled />
                     <MudTextField T="string" Label="Nama Lengkap" @bind-Value="@namaLengkap" />
                     <MudTextField T="string" Label="Email" RequiredError="Email is required!" Disabled @bind-Value="@email" />
                     <MudTextField T="string" Label="Alamat" @bind-Value="@alamat" />

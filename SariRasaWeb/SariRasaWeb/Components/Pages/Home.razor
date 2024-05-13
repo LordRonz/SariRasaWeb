@@ -110,7 +110,7 @@ else
             await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
 
             var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
-            point = sldPoint.POINT ?? 0;
+            point = sldPoint?.POINT ?? 0;
 
             StateHasChanged();
         }
