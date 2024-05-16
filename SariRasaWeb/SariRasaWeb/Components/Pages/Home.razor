@@ -1,4 +1,5 @@
 ﻿@page "/"
+@layout SariRasaWeb.Components.Layout.HomeLayout
 @using Microsoft.EntityFrameworkCore;
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
@@ -11,49 +12,60 @@
 <PageTitle>Home</PageTitle>
 
 @if (loaded)
-{
-    <MudPaper Class="pa-4 mb-4" Elevation="3">
-        <div class="d-flex align-items-center gap-4">
-            @* <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage> *@
-            <div>
-                <h2 class="h4">Hello @name</h2>
-                <h3 class="h6 text-danger">Jumlah Point</h3>
-                <h3 class="h6">@point</h3>
+{   <div class="w-100 d-flex align-items-center flex-column home-container">
+        <MudContainer Class="d-flex flex-column justify-content-between" Style="height: 38vh;">
+            <div class="w-100 mt-6 d-flex justify-content-end">
+                <MudImage Src="images/logo-SR.jpeg" Alt="Sari Rasa" Elevation="25" Class="" Width="35" Height="35" />
             </div>
-        </div>
-    </MudPaper>
-    <MudPaper Class="pa-4 mb-4" Elevation="3" Style="background: rgb(248, 246, 204)">
-        <div class="d-flex align-items-center justify-content-center gap-4">
-            <div>
-                <h3 class="h4 m-0">Kartu Member</h3>
+            <div class="d-flex align-items-center gap-4 w-100 align-items-start">
+                @* <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage> *@
+                <div>
+                    <p class="m-0 p-0 text-white">Hello,</p>
+                    <h2 class="h4 text-white">@name</h2>
+                    <h3 class="h6 text-white">Jumlah Point</h3>
+                    <h3 class="h6 text-white">@point</h3>
+                </div>
             </div>
-            <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Error" Href="/card" Class="rounded-pill">Lihat Kartu</MudButton>
-        </div>
-    </MudPaper>
-    <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Melalui Whatsapp" Class="w-100" Target="_blank" Href="https://wa.me/628113500899" />
-    @if (promosi.Length > 0)
-    {
-        <MudCarousel Class="mud-width-full d-md-none mt-4" Style="height:250px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
-            @foreach (MPromosi p in promosi)
-            {
-                <MudCarouselItem Transition="transition">
-                    <div class="d-flex justify-content-center h-100 w-100" style="">
-                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
+            <MudPaper Class="pa-4 kartu-member-container" Elevation="3" Style="background: #E7C449; justify-self: end; margin-bottom: -6px">
+                <div class="d-flex align-items-center justify-content-center gap-4">
+                    <div>
+                        <h3 class="h4 m-0 text-uppercase">Kartu Member</h3>
                     </div>
-                </MudCarouselItem>
-            }
-        </MudCarousel>
-        <MudCarousel Class="mud-width-full d-none d-md-block mt-4" Style="height:350px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
-            @foreach (MPromosi p in promosi)
-            {
-                <MudCarouselItem Transition="transition">
-                    <div class="d-flex justify-content-center h-100 w-100" style="">
-                        <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
-                    </div>
-                </MudCarouselItem>
-            }
-        </MudCarousel>
-    }
+                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Error" Href="/card" Style="border-radius: 10px; background: #F4F1F1; color: #FB0000; text-transform: capitalize">Lihat Kartu</MudButton>
+                </div>
+            </MudPaper>
+        </MudContainer>
+        <MudCard Class="w-100 pb-24 position-relative promo-container">
+            <MudContainer Class="pt-8">
+                <MudText Class="mb-2">Sari Rasa Online Shopping (08.00 ~ 20.00)</MudText>
+                <MudFab Color="Color.Success" Style="border-radius: 10px;" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Via Whatsapp" Class="w-100 mb-4" Target="_blank" Href="https://wa.me/628113500899" />
+                <MudText>Promosi</MudText>
+                @if (promosi.Length > 0)
+                {
+                    <MudCarousel Class="mud-width-full d-md-none mt-2" Style="height:250px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+                        @foreach (MPromosi p in promosi)
+                        {
+                            <MudCarouselItem Transition="transition">
+                                <div class="d-flex justify-content-center h-100 w-100" style="">
+                                    <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
+                                </div>
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                    <MudCarousel Class="mud-width-full d-none d-md-block mt-2" Style="height:350px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
+                        @foreach (MPromosi p in promosi)
+                        {
+                            <MudCarouselItem Transition="transition">
+                                <div class="d-flex justify-content-center h-100 w-100" style="">
+                                    <MudImage Src="@GetPromosiLink(p.Promosi)" Alt="Promosi" Class="rounded-lg" Style="min-height:100%; min-width: 100%; object-fit: contain;" />
+                                </div>
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                }
+            </MudContainer>
+        </MudCard>
+    </div>
 }
 else
 {
@@ -107,12 +119,25 @@ else
             var now = DateTime.Now;
             promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
 
-            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
+            // await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
 
-            var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
-            point = sldPoint?.POINT ?? 0;
+            //var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
+            //point = sldPoint?.POINT ?? 0;
 
             StateHasChanged();
         }
     }
 }
+
+<style>
+    .kartu-member-container {
+        border-radius: 20px 20px 0px 0px;
+        max-width: 100%;
+    }
+    .promo-container {
+        border-top-left-radius: 30px !important;
+    }
+    .home-container {
+        background: linear-gradient(151.34deg, #C61818 -0.49%, #600C0C 60.04%);
+    }
+</style>
