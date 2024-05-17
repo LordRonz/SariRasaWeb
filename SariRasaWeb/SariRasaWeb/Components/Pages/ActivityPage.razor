@@ -16,6 +16,8 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @code {
+    [CascadingParameter]
+    public SariRasaWeb.Components.Layout.MainLayout Layout { get; set; }
     private bool _hidePosition;
     private bool _loading;
     private IEnumerable<Element> Elements = new List<Element>();
@@ -24,6 +26,11 @@
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     private IEnumerable<PatientModel> Patients = new List<PatientModel>();
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitle("Your Transaction History");
+    }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -47,7 +54,7 @@
 
             var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
 
-            // await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_HistoryPoint '{customer.NOMBR}'");
+            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_HistoryPoint '{customer.NOMBR}'");
 
             var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).OrderByDescending(c => c.TGFAK).ToArrayAsync();
 

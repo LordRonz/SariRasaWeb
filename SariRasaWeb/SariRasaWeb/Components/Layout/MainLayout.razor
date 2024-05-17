@@ -32,27 +32,36 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
-<MudLayout>
-    <MudAppBar Class="bg-danger">
-        <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
-            <MudImage Src="images/logo-SR.jpeg" Alt="Sari Rasa" Elevation="25" Class="" Width="35" Height="35" />
-            <p class="text-uppercase m-0 p-0 align-self-center h5 text-white">SARI RASA</p>
-        </MudLink>
-        <MudSpacer />
-        <MudLink Href="/profile">
-            <MudImage Src="images/profile.jpg" Alt="Profile" Elevation="25" Class="rounded-circle" Width="35" Height="35" />
-        </MudLink>
-    </MudAppBar>
-    <MudMainContent Class="mb-16 pb-16">
-        <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-    <SariRasaWeb.Components.Layout.Footer.Footer />
-</MudLayout>
+<CascadingValue Value="this">
+    <MudLayout>
+        <MudAppBar Class="bg-danger">
+            <MudLink Href="/profile">
+                <p class="m-0 p-0 align-self-center h5 text-white">@Title</p>
+            </MudLink>
+            <MudSpacer />
+            <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
+                <MudImage Src="images/logo-SR.jpeg" Alt="Sari Rasa" Elevation="25" Class="" Width="35" Height="35" />
+            </MudLink>
+        </MudAppBar>
+        <MudMainContent Class="mb-16 pb-16">
+            <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+        <SariRasaWeb.Components.Layout.Footer.Footer />
+    </MudLayout>
+</CascadingValue>
 
 @code {
     bool _drawerOpen = true;
+
+    public string Title { get; set; } = "SARI RASA";
+
+    public void ChangeTitle(string newTitle)
+    {
+        Title = newTitle;
+        StateHasChanged();
+    }
 
     void DrawerToggle()
     {

@@ -20,10 +20,10 @@
             <div class="d-flex align-items-center gap-4 w-100 align-items-start">
                 @* <MudImage Src="/images/profile.jpg" Class="rounded-circle profile-image" Width="80" Height="80"></MudImage> *@
                 <div>
-                    <p class="m-0 p-0 text-white">Hello,</p>
-                    <h2 class="h4 text-white">@name</h2>
-                    <h3 class="h6 text-white">Jumlah Point</h3>
-                    <h3 class="h6 text-white">@point</h3>
+                    <p class="m-0 p-0 text-white fw-light">Hello,</p>
+                    <h2 class="h2 fw-light text-white mb-4">@name</h2>
+                    <h3 class="h6 text-white fw-light">Jumlah Point</h3>
+                    <h3 class="h2 text-white">@point</h3>
                 </div>
             </div>
             <MudPaper Class="pa-4 kartu-member-container" Elevation="3" Style="background: #E7C449; justify-self: end; margin-bottom: -6px">
@@ -37,9 +37,9 @@
         </MudContainer>
         <MudCard Class="w-100 pb-24 position-relative promo-container">
             <MudContainer Class="pt-8">
-                <MudText Class="mb-2">Sari Rasa Online Shopping (08.00 ~ 20.00)</MudText>
+                <MudText Class="mb-2 fw-bold">Sari Rasa Online Shopping (08.00 ~ 20.00)</MudText>
                 <MudFab Color="Color.Success" Style="border-radius: 10px;" StartIcon="@Icons.Material.Filled.Whatsapp" Label="Order Via Whatsapp" Class="w-100 mb-4" Target="_blank" Href="https://wa.me/628113500899" />
-                <MudText>Promosi</MudText>
+                <MudText Class="fw-bold">Promosi</MudText>
                 @if (promosi.Length > 0)
                 {
                     <MudCarousel Class="mud-width-full d-md-none mt-2" Style="height:250px;" ShowArrows="@arrows" ShowBullets="@bullets" EnableSwipeGesture="@enableSwipeGesture" AutoCycle="@autocycle" TData="object">
@@ -119,10 +119,10 @@ else
             var now = DateTime.Now;
             promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
 
-            // await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
+            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
 
-            //var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
-            //point = sldPoint?.POINT ?? 0;
+            var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
+            point = sldPoint?.POINT ?? 0;
 
             StateHasChanged();
         }

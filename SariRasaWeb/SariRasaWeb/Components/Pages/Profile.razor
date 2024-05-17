@@ -42,6 +42,8 @@
 @inject ISnackbar Snackbar
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
+    [CascadingParameter]
+    public SariRasaWeb.Components.Layout.MainLayout Layout { get; set; }
 
     bool success;
     string[] errors = { };
@@ -82,6 +84,11 @@
     private void OpenDialog()
     {
         DialogService.Show<SariRasaWeb.Components.Dialog.LogOutDialog>("Log Out");
+    }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitle("Account");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -28,6 +28,8 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @code {
+    [CascadingParameter]
+    public SariRasaWeb.Components.Layout.MainLayout Layout { get; set; }
     private bool arrows = true;
     private bool bullets = true;
     private bool enableSwipeGesture = true;
@@ -43,6 +45,11 @@
         var img = b.Encode(Type.Code128, dataToEncode, SKColors.Black, SKColors.White, 290, 120);
         var data = img.Encode(SKEncodedImageFormat.Png, 50);
         this.data = "data:image/png;base64," + Convert.ToBase64String(data.ToArray());
+    }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitle("Your Card");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
