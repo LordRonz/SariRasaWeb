@@ -9,8 +9,6 @@ namespace SariRasaWeb.Models
         public string NMCUS { get; set; }
         public string? ALAMAT { get; set; }
         public string? KOTA { get; set; }
-        public string? TEL1A { get; set; }
-        public string? TEL1B { get; set; }
         public string? NOMHP { get; set; }
         public string? TIPEC { get; set; }
         public string? NOMBR { get; set; }

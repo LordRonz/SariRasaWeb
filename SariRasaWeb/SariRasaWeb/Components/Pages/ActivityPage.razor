@@ -9,10 +9,15 @@
 @using PatientModel = SariRasaWeb.Models.Patient
 @using Table = SariRasaWeb.Components.Table.Table
 
+@using Timer = System.Timers.Timer;
+
+@implements IDisposable;
+
 <SariRasaWeb.Components.Table.Table Config="Config" />
 
 
-@inject AppDbContext dbContext
+@* @inject AppDbContext dbContext *@
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @code {
@@ -23,6 +28,9 @@
     private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
+    private MCustomer customer;
+    Timer _timer;
+
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     private IEnumerable<PatientModel> Patients = new List<PatientModel>();
@@ -30,6 +38,19 @@
     protected override void OnInitialized()
     {
         Layout.ChangeTitle("Your Transaction History");
+    }
+
+    private void StartHotReload()
+    {
+        _timer = new Timer(10000); // 10 seconds interval
+        _timer.Elapsed += async (sender, e) => await LoadHistoryAndUpdateUi();
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 
 
@@ -52,26 +73,49 @@
 
             var userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
 
-            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
+            var dbContext = DbFactory.CreateDbContext();
 
-            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_HistoryPoint '{customer.NOMBR}'");
+            customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
 
-            var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).OrderByDescending(c => c.TGFAK).ToArrayAsync();
+            await LoadHistory();
 
-            var dataSource = histories.Select(el =>
-            {
-                return (object) new { tanggal = el.TGFAK, keterangan = el.POINT > 0 ? "Penambahan Poin" : "Pengurangan Poin", point = el.POINT };
-            }
-            ).ToList();
+            StartHotReload();
 
-            Config = new TableConfig(new List<TableColumn> {
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadHistoryAndUpdateUi()
+    {
+        await LoadHistory();
+        try
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+        catch
+        {  // empty on purpose
+        }
+    }
+
+    private async Task LoadHistory()
+    {
+        var dbContext = DbFactory.CreateDbContext();
+
+        await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_HistoryPoint '{customer.NOMBR}'");
+
+        var histories = await dbContext.HistoryPoint.Where(c => c.NOMBR == customer.NOMBR).OrderByDescending(c => c.TGFAK).ToArrayAsync();
+
+        var dataSource = histories.Select(el =>
+        {
+            return (object)new { tanggal = el.TGFAK, keterangan = el.POINT > 0 ? "Penambahan Poin" : "Pengurangan Poin", point = el.POINT };
+        }
+        ).ToList();
+
+        Config = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Tgl", DataField="tanggal" },
                 new TableColumn { Caption="Keterangan", DataField="keterangan" },
                 new TableColumn { Caption="Point", DataField="point" },
             }, dataSource);
-
-            StateHasChanged();
-        }
     }
 
 }

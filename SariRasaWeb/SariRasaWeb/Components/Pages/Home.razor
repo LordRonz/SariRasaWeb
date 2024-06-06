@@ -1,6 +1,7 @@
 ﻿@page "/"
 @layout SariRasaWeb.Components.Layout.HomeLayout
 @using Microsoft.EntityFrameworkCore;
+@using System.Timers
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using SariRasaWeb.Data
@@ -8,6 +9,9 @@
 @using Color = MudBlazor.Color
 @using Transition = MudBlazor.Transition
 @using Size = MudBlazor.Size
+@using Timer = System.Timers.Timer;
+
+@implements IDisposable;
 
 <PageTitle>Home</PageTitle>
 
@@ -75,9 +79,11 @@ else
 }
 
 
-@inject AppDbContext dbContext
+@* @inject AppDbContext dbContext *@
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
+@inject IServiceScopeFactory serviceFactory
 @code {
     private bool arrows = true;
     private bool bullets = true;
@@ -85,6 +91,9 @@ else
     private bool autocycle = true;
     private Transition transition = Transition.Slide;
     private bool loaded = false;
+
+    Timer _timer;
+    MCustomer customer;
 
     string userName = "";
     string name = "";
@@ -94,6 +103,19 @@ else
     private string GetPromosiLink(string slug)
     {
         return $"images/{slug}";
+    }
+
+    private void StartHotReload()
+    {
+        _timer = new Timer(10000); // 10 seconds interval
+        _timer.Elapsed += async (sender, e) => await LoadPromosiAndUpdateUi();
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -112,20 +134,47 @@ else
                 return;
             }
 
+            var dbContext = DbFactory.CreateDbContext();
+
             userName = SariRasaWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-            var customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
+            customer = await dbContext.MCustomer.Where(c => c.NOMHP == userName).FirstOrDefaultAsync();
             name = customer.NMCUS;
-            loaded = true;
+
             var now = DateTime.Now;
+
             promosi = await dbContext.MPromosi.Where(t => t.TGLAwal <= now && t.TGLAkhir >= now).OrderByDescending(t => t.Promosi).ToArrayAsync();
 
-            await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
+            await LoadPromosi();
 
-            var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
-            point = sldPoint?.POINT ?? 0;
+            StartHotReload();
+
+            loaded = true;
 
             StateHasChanged();
         }
+    }
+
+    private async Task LoadPromosiAndUpdateUi()
+    {
+        await LoadPromosi();
+        try
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+        catch
+        {  // empty on purpose
+        }
+    }
+
+    private async Task LoadPromosi()
+    {
+        var dbContext = DbFactory.CreateDbContext();
+
+        await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_CekPoint '{customer.NOMBR}'");
+        // await dbContext.Database.ExecuteSqlAsync($"EXECUTE usp_Customer_View '{customer.NOMBR}'");
+  
+        var sldPoint = await dbContext.SldPoint.Where(p => p.NOMBR == customer.NOMBR).FirstOrDefaultAsync();
+        point = sldPoint?.POINT ?? 0;
     }
 }
 

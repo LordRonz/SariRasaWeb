@@ -1,4 +1,5 @@
 using BlazorReports.Extensions;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using SariRasaWeb.Client.Pages;
 using SariRasaWeb.Components;
@@ -22,6 +23,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddBlazorReports();
 builder.Services.AddScoped<AppDbContext>();
+
+builder.Services.AddDbContextFactory<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 
 var app = builder.Build();
 
